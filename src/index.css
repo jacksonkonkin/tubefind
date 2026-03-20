@@ -1,0 +1,129 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Space Grotesk', system-ui, sans-serif;
+
+  /* Primary: vibrant blue */
+  --color-primary: #3c6ef0;
+  --color-primary-light: #6b91f5;
+  --color-primary-dark: #2a54c7;
+
+  /* Secondary: muted blue-grey */
+  --color-secondary: #6575ab;
+  --color-secondary-light: #8493bf;
+
+  /* Tertiary: deep orange accent */
+  --color-accent: #a63800;
+  --color-accent-light: #d44a00;
+
+  /* Surfaces — dark mode */
+  --color-surface: #0b0e1a;
+  --color-surface-elevated: #111627;
+  --color-card: rgba(255, 255, 255, 0.06);
+  --color-card-hover: rgba(255, 255, 255, 0.10);
+
+  /* Text */
+  --color-text: #e8eaf0;
+  --color-text-muted: #757680;
+  --color-text-bright: #ffffff;
+
+  /* Borders */
+  --color-border: rgba(255, 255, 255, 0.10);
+  --color-border-glow: rgba(60, 110, 240, 0.4);
+
+  /* Card neon border colors */
+  --color-neon-blue: #5b9cf5;
+  --color-neon-pink: #e879f9;
+  --color-neon-green: #4ade80;
+  --color-neon-cyan: #22d3ee;
+  --color-neon-orange: #fb923c;
+  --color-neon-purple: #a78bfa;
+}
+
+body {
+  margin: 0;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
+
+/* Space background */
+.space-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(60, 110, 240, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 60% 80%, rgba(166, 56, 0, 0.05) 0%, transparent 50%),
+    var(--color-surface);
+  overflow: hidden;
+}
+
+/* Starfield dots — rendered via small box-shadows for performance */
+.space-bg::before {
+  content: '';
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  top: 0;
+  left: 0;
+  box-shadow:
+    80px 60px 0 rgba(255,255,255,0.3),
+    200px 140px 0 rgba(255,255,255,0.25),
+    320px 40px 0 rgba(255,255,255,0.35),
+    440px 180px 0 rgba(255,255,255,0.2),
+    560px 100px 0 rgba(255,255,255,0.3),
+    680px 220px 0 rgba(255,255,255,0.25),
+    120px 280px 0 rgba(255,255,255,0.2),
+    400px 260px 0 rgba(255,255,255,0.3),
+    740px 160px 0 rgba(255,255,255,0.35),
+    240px 80px 0 rgba(255,255,255,0.25),
+    50px 400px 0 rgba(255,255,255,0.2),
+    350px 350px 0 rgba(255,255,255,0.3),
+    600px 320px 0 rgba(255,255,255,0.25),
+    150px 500px 0 rgba(255,255,255,0.2),
+    500px 450px 0 rgba(255,255,255,0.35),
+    700px 380px 0 rgba(255,255,255,0.2),
+    280px 520px 0 rgba(255,255,255,0.25),
+    620px 480px 0 rgba(255,255,255,0.3);
+}
+
+/* Focus ring — visible only for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--color-primary-light);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Glassmorphism card base */
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.25s ease;
+}
+
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Skip link for keyboard users */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  padding: 8px 16px;
+  background: var(--color-primary);
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  z-index: 100;
+  transition: top 0.2s;
+}
+
+.skip-link:focus {
+  top: 0;
+}
