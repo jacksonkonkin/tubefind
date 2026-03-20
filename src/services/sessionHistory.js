@@ -207,6 +207,39 @@ export function getSessionCount() {
   return loadSessions().length;
 }
 
+/**
+ * Get the best "Quick Start" selections — the most common complete filter set,
+ * weighted by recency and engagement.
+ * Returns { selections, score } or null if no complete sessions exist.
+ */
+export function getQuickStart() {
+  const sessions = loadSessions();
+  // Only consider sessions with at least level_1 through level_5
+  const complete = sessions.filter((s) => {
+    const sel = s.selections;
+    return sel.level_1 && sel.level_2?.length && sel.level_3 && sel.level_4 && sel.level_5;
+  });
+  if (complete.length === 0) return null;
+
+  // Group by a fingerprint of levels 1-5
+  const groups = {};
+  for (const session of complete) {
+    const sel = session.selections;
+    const key = [
+      sel.level_1,
+      (sel.level_2 || []).slice().sort().join(','),
+      sel.level_3,
+      sel.level_4,
+      sel.level_5,
+    ].join('|');
+    if (!groups[key]) groups[key] = { selections: sel, score: 0 };
+    groups[key].score += recencyWeight(session.timestamp) * engagementWeight(session);
+  }
+
+  const best = Object.values(groups).sort((a, b) => b.score - a.score)[0];
+  return best || null;
+}
+
 // ── Saved filter presets ──
 
 export function loadPresets() {
