@@ -8,7 +8,8 @@ import Level5Freshness from '../components/levels/Level5Freshness';
 import Level6Creator from '../components/levels/Level6Creator';
 import FilterSummary from '../components/FilterSummary';
 import SavedPresets from '../components/SavedPresets';
-import { RotateCcw } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { RotateCcw, BarChart3 } from 'lucide-react';
 
 function CurrentLevel() {
   const { currentLevel } = useFilter();
@@ -33,6 +34,7 @@ function CurrentLevel() {
 
 export default function FunnelPage() {
   const { reset, currentLevel } = useFilter();
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen flex flex-col relative">
@@ -50,16 +52,26 @@ export default function FunnelPage() {
             </div>
             <span className="font-bold text-lg text-text-bright tracking-tight">TubeFind</span>
           </div>
-          {currentLevel > 1 && (
+          <div className="flex items-center gap-2">
             <button
-              onClick={reset}
+              onClick={() => navigate('/analytics')}
               className="flex items-center gap-1.5 text-sm text-text-muted hover:text-primary-light
-                transition-colors px-3 py-1.5 rounded-md hover:bg-card-hover"
+                transition-colors px-3 py-1.5 rounded-md hover:bg-card-hover cursor-pointer"
             >
-              <RotateCcw className="w-3.5 h-3.5" />
-              Start over
+              <BarChart3 className="w-3.5 h-3.5" aria-hidden="true" />
+              Analytics
             </button>
-          )}
+            {currentLevel > 1 && (
+              <button
+                onClick={reset}
+                className="flex items-center gap-1.5 text-sm text-text-muted hover:text-primary-light
+                  transition-colors px-3 py-1.5 rounded-md hover:bg-card-hover cursor-pointer"
+              >
+                <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" />
+                Start over
+              </button>
+            )}
+          </div>
         </div>
       </header>
 
