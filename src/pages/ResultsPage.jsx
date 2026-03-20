@@ -12,7 +12,7 @@ import {
 import {
   ArrowLeft, ExternalLink, Eye, ThumbsUp, ThumbsDown,
   Loader2, SearchX, AlertTriangle, RotateCcw, RefreshCw,
-  Bookmark, Check,
+  Bookmark, Check, BarChart3,
 } from 'lucide-react';
 import SavePresetDialog from '../components/SavePresetDialog';
 
@@ -339,6 +339,15 @@ export default function ResultsPage() {
             >
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} aria-hidden="true" />
               Refresh
+            </button>
+            {/* Analytics */}
+            <button
+              onClick={() => navigate('/analytics')}
+              className="flex items-center gap-1.5 text-sm text-text-muted hover:text-primary-light
+                transition-colors px-3 py-1.5 rounded-md hover:bg-card-hover cursor-pointer"
+            >
+              <BarChart3 className="w-3.5 h-3.5" aria-hidden="true" />
+              Analytics
             </button>
             {/* Start over */}
             <button
