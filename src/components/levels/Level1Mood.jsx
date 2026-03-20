@@ -1,8 +1,10 @@
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { Zap } from 'lucide-react';
 import { useFilter } from '../../context/FilterContext';
 import { moodOptions } from '../../data/filterOptions';
-import { getSuggestion, getSessionCount } from '../../services/sessionHistory';
+import { getSuggestion, getSessionCount, getQuickStart } from '../../services/sessionHistory';
 import LevelShell from '../LevelShell';
 import SuggestionBanner from '../SuggestionBanner';
 
@@ -17,11 +19,25 @@ const cardVariants = {
 
 export default function Level1Mood() {
   const { selections, setSelection, nextLevel } = useFilter();
+  const navigate = useNavigate();
   const selected = selections.level_1;
   const [dismissed, setDismissed] = useState(false);
 
   const suggestion = useMemo(() => getSuggestion(1, selections), []);
   const sessionCount = useMemo(() => getSessionCount(), []);
+  const quickStart = useMemo(() => getQuickStart(), []);
+
+  const handleQuickStart = () => {
+    if (!quickStart) return;
+    const s = quickStart.selections;
+    if (s.level_1) setSelection(1, s.level_1);
+    if (s.level_2) setSelection(2, s.level_2);
+    if (s.level_3) setSelection(3, s.level_3);
+    if (s.level_4) setSelection(4, s.level_4);
+    if (s.level_5) setSelection(5, s.level_5);
+    if (s.level_6) setSelection(6, s.level_6);
+    navigate('/results');
+  };
   const showSuggestion = suggestion && !selected && !dismissed && sessionCount > 0;
 
   const suggestedOption = showSuggestion
@@ -43,6 +59,26 @@ export default function Level1Mood() {
       title="What are you in the mood for?"
       subtitle="Pick the vibe and we'll find the perfect videos"
     >
+      {quickStart && !selected && (
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="mb-6 flex justify-center"
+        >
+          <button
+            onClick={handleQuickStart}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-semibold
+              bg-primary/15 border border-primary/30 text-primary-light
+              hover:bg-primary/25 hover:border-primary/50
+              transition-all cursor-pointer"
+          >
+            <Zap className="w-4 h-4" aria-hidden="true" />
+            Quick Start — rerun your top filters
+          </button>
+        </motion.div>
+      )}
+
       {showSuggestion && suggestedOption && (
         <SuggestionBanner
           label={suggestedOption.label}

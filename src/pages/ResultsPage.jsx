@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback, memo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useFilter } from '../context/FilterContext';
 import { searchVideos } from '../services/youtube';
@@ -9,10 +9,11 @@ import {
   trackVideoFeedback,
   getSessionFeedback,
 } from '../services/sessionHistory';
+import { decodeSelections, buildShareUrl } from '../services/shareLink';
 import {
   ArrowLeft, ExternalLink, Eye, ThumbsUp, ThumbsDown,
   Loader2, SearchX, AlertTriangle, RotateCcw, RefreshCw,
-  Bookmark, Check, BarChart3,
+  Bookmark, Check, BarChart3, Share2, Link,
 } from 'lucide-react';
 import SavePresetDialog from '../components/SavePresetDialog';
 
@@ -224,19 +225,23 @@ function ErrorState({ message, onRetry }) {
 }
 
 export default function ResultsPage() {
-  const { selections, reset } = useFilter();
+  const { selections, setSelection, reset } = useFilter();
   const navigate = useNavigate();
+  const location = useLocation();
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [feedback, setFeedback] = useState({});
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [copied, setCopied] = useState(false);
   const sessionIdRef = useRef(null);
   const abortRef = useRef(null);
 
+  // Resolve effective selections: from context or URL params
+  const effectiveSelections = useRef(selections);
+
   const fetchResults = useCallback(async () => {
-    // Cancel any in-flight request
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
@@ -244,7 +249,7 @@ export default function ResultsPage() {
     setLoading(true);
     setError(null);
     try {
-      const results = await searchVideos(selections, { signal: controller.signal });
+      const results = await searchVideos(effectiveSelections.current, { signal: controller.signal });
       setVideos(results);
     } catch (err) {
       if (err.name === 'AbortError') return;
@@ -252,16 +257,28 @@ export default function ResultsPage() {
     } finally {
       if (!controller.signal.aborted) setLoading(false);
     }
-  }, [selections]);
+  }, []);
 
   useEffect(() => {
-    // Guard: redirect home if no selections made
-    if (!selections.level_1) {
+    // Check for shared link params
+    const shared = decodeSelections(location.search);
+    if (shared) {
+      // Restore shared selections into context
+      if (shared.level_1) setSelection(1, shared.level_1);
+      if (shared.level_2?.length) setSelection(2, shared.level_2);
+      if (shared.level_3) setSelection(3, shared.level_3);
+      if (shared.level_4) setSelection(4, shared.level_4);
+      if (shared.level_5) setSelection(5, shared.level_5);
+      if (shared.level_6 && Object.keys(shared.level_6).length) setSelection(6, shared.level_6);
+      effectiveSelections.current = shared;
+    } else if (!selections.level_1) {
       navigate('/', { replace: true });
       return;
+    } else {
+      effectiveSelections.current = selections;
     }
 
-    const id = saveSession(selections);
+    const id = saveSession(effectiveSelections.current);
     sessionIdRef.current = id;
     if (id) setFeedback(getSessionFeedback(id));
     fetchResults();
@@ -297,6 +314,18 @@ export default function ResultsPage() {
     setTimeout(() => setSaved(false), 2000);
   };
 
+  const handleShare = async () => {
+    const url = buildShareUrl(effectiveSelections.current);
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback: prompt user
+      window.prompt('Copy this link:', url);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col relative">
       <div className="space-bg" />
@@ -317,6 +346,18 @@ export default function ResultsPage() {
             <span className="font-bold text-lg text-text-bright tracking-tight">Results</span>
           </div>
           <div className="flex items-center gap-2">
+            {/* Share */}
+            <button
+              onClick={handleShare}
+              className={`flex items-center gap-1.5 text-sm transition-colors px-3 py-1.5 rounded-md cursor-pointer ${
+                copied
+                  ? 'text-[#4ade80] bg-[#4ade80]/10'
+                  : 'text-text-muted hover:text-primary-light hover:bg-card-hover'
+              }`}
+            >
+              {copied ? <Check className="w-3.5 h-3.5" aria-hidden="true" /> : <Link className="w-3.5 h-3.5" aria-hidden="true" />}
+              {copied ? 'Copied' : 'Share'}
+            </button>
             {/* Save preset */}
             <button
               onClick={() => setShowSaveDialog(true)}

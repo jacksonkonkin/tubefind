@@ -127,3 +127,42 @@ body {
 .skip-link:focus {
   top: 0;
 }
+
+/* ── Light theme overrides ── */
+[data-theme="light"] {
+  --color-surface: #f5f6fa;
+  --color-surface-elevated: #ffffff;
+  --color-card: rgba(0, 0, 0, 0.04);
+  --color-card-hover: rgba(0, 0, 0, 0.07);
+  --color-text: #2d2f3a;
+  --color-text-muted: #6b6d7b;
+  --color-text-bright: #111218;
+  --color-border: rgba(0, 0, 0, 0.10);
+}
+
+[data-theme="light"] body {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
+
+[data-theme="light"] .space-bg {
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(60, 110, 240, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 60% 80%, rgba(166, 56, 0, 0.03) 0%, transparent 50%),
+    var(--color-surface);
+}
+
+[data-theme="light"] .space-bg::before {
+  display: none;
+}
+
+[data-theme="light"] .glass-card {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .glass-card:hover {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.12);
+}

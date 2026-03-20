@@ -9,7 +9,8 @@ import Level6Creator from '../components/levels/Level6Creator';
 import FilterSummary from '../components/FilterSummary';
 import SavedPresets from '../components/SavedPresets';
 import { useNavigate } from 'react-router-dom';
-import { RotateCcw, BarChart3 } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
+import { RotateCcw, BarChart3, Sun, Moon } from 'lucide-react';
 
 function CurrentLevel() {
   const { currentLevel } = useFilter();
@@ -35,6 +36,7 @@ function CurrentLevel() {
 export default function FunnelPage() {
   const { reset, currentLevel } = useFilter();
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <div className="min-h-screen flex flex-col relative">
@@ -53,6 +55,16 @@ export default function FunnelPage() {
             <span className="font-bold text-lg text-text-bright tracking-tight">TubeFind</span>
           </div>
           <div className="flex items-center gap-2">
+            <button
+              onClick={toggleTheme}
+              aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+              className="p-1.5 rounded-md text-text-muted hover:text-primary-light
+                transition-colors hover:bg-card-hover cursor-pointer"
+            >
+              {theme === 'dark'
+                ? <Sun className="w-4 h-4" aria-hidden="true" />
+                : <Moon className="w-4 h-4" aria-hidden="true" />}
+            </button>
             <button
               onClick={() => navigate('/analytics')}
               className="flex items-center gap-1.5 text-sm text-text-muted hover:text-primary-light
